@@ -66,6 +66,8 @@ impl Multiplier {
             ("shiden", _v) => V2(new_u128(inner)),
             ("astar", _v) => V2(new_u128(inner)),
 
+            ("aleph-node", _v) => V2(new_u128(inner)),
+
             ("statemine", _v) => V2(new_u128(inner)),
             ("statemint", _v) => V2(new_u128(inner)),
 
