@@ -24,18 +24,21 @@ import { acalaControllers } from './acalaControllers';
 import { alephControllers } from './alephControllers';
 import { astarControllers } from './astarControllers';
 import { bifrostControllers } from './bifrostControllers';
+import { bifrostPolkadotControllers } from './bifrostPolkadotControllers';
 import { calamariControllers } from './calamariControllers';
 import { crustControllers } from './crustControllers';
 import { defaultControllers } from './defaultControllers';
 import { dockMainnetControllers } from './dockMainnetControllers';
 import { dockPoSMainnetControllers } from './dockPoSMainnetControllers';
 import { dockTestnetControllers } from './dockPoSTestnetControllers';
+import { heikoControllers } from './heikoControllers';
 import { karuraControllers } from './karuraControllers';
 import { kiltControllers } from './kiltControllers';
 import { kulupuControllers } from './kulupuControllers';
 import { kusamaControllers } from './kusamaControllers';
 import { mandalaControllers } from './mandalaControllers';
 import { mantaControllers } from './mantaControllers';
+import { parallelControllers } from './parallelControllers';
 import { polkadotControllers } from './polkadotControllers';
 import { polymeshControllers } from './polymeshControllers';
 import { shidenControllers } from './shidenControllers';
@@ -69,6 +72,9 @@ const specToControllerMap: { [x: string]: ControllerConfig } = {
 	manta: mantaControllers,
 	crust: crustControllers,
 	bifrost: bifrostControllers,
+	bifrost_polkadot: bifrostPolkadotControllers,
+	heiko: heikoControllers,
+	parallel: parallelControllers,
 };
 
 /**

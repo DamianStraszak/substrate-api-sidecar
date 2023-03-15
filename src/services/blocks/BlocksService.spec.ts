@@ -23,6 +23,7 @@ import { BlockHash, Hash, SignedBlock } from '@polkadot/types/interfaces';
 import { BadRequest } from 'http-errors';
 import LRU from 'lru-cache';
 
+import { QueryFeeDetailsCache } from '../../chains-config/cache';
 import { sanitizeNumbers } from '../../sanitize/sanitizeNumbers';
 import { createCall } from '../../test-helpers/createCall';
 import {
@@ -62,6 +63,9 @@ const nextFeeMultiplierAt = (_hash: Hash) =>
 
 const mockHistoricApi = {
 	registry: polkadotRegistry,
+	call: {
+		transactionPaymentApi: {},
+	},
 	consts: {
 		transactionPayment: {
 			transactionByteFee: polkadotRegistry.createType('Balance', 1000000),
@@ -113,13 +117,18 @@ type GetBlock = PromiseRpcResult<
 const cache = new LRU({ max: 2 }) as LRU<string, IBlock>;
 
 // Block Service
-const blocksService = new BlocksService(mockApi, 0, cache);
+const blocksService = new BlocksService(
+	mockApi,
+	0,
+	cache,
+	new QueryFeeDetailsCache(null, null)
+);
 
 describe('BlocksService', () => {
 	describe('fetchBlock', () => {
 		it('works when ApiPromise works (block 789629)', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			// fetchBlock options
 			const options = {
@@ -143,7 +152,7 @@ describe('BlocksService', () => {
 
 		it('throws when an extrinsic is undefined', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 			// Create a block with undefined as the first extrinisic and the last extrinsic removed
 			const mockBlock789629BadExt = polkadotRegistry.createType(
 				'Block',
@@ -181,7 +190,7 @@ describe('BlocksService', () => {
 
 		it('Returns the finalized tag as undefined when omitFinalizedTag equals true', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 			// fetchBlock options
 			const options = {
 				eventDocs: true,
@@ -203,7 +212,7 @@ describe('BlocksService', () => {
 
 	describe('BlocksService.parseGenericCall', () => {
 		// Reset LRU cache
-		cache.reset();
+		cache.clear();
 
 		const transfer = createCall('balances', 'transfer', {
 			value: 12,
@@ -358,7 +367,7 @@ describe('BlocksService', () => {
 
 		it('Returns false when queried blockId is not canonical', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			const getHeader = (_hash: Hash) =>
 				Promise.resolve().then(() => mockForkedBlock789629.header);
@@ -392,7 +401,12 @@ describe('BlocksService', () => {
 		});
 
 		it('Returns true when queried blockId is canonical', async () => {
-			const blocksService = new BlocksService(mockApi, 0, new LRU());
+			const blocksService = new BlocksService(
+				mockApi,
+				0,
+				new LRU({ max: 2 }),
+				new QueryFeeDetailsCache(null, null)
+			);
 			expect(
 				await blocksService['isFinalizedBlock'](
 					mockApi,
@@ -417,7 +431,7 @@ describe('BlocksService', () => {
 
 		it('Returns the correct extrinisics object for block 789629', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			const block = await blocksService.fetchBlock(
 				blockHash789629,
@@ -438,7 +452,7 @@ describe('BlocksService', () => {
 
 		it("Throw an error when `extrinsicIndex` doesn't exist", async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			const block = await blocksService.fetchBlock(
 				blockHash789629,
@@ -491,7 +505,7 @@ describe('BlocksService', () => {
 		};
 		it('Returns the correct summary for the latest block', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			const blockSummary = await blocksService.fetchBlockHeader(
 				blockHash789629
@@ -502,7 +516,7 @@ describe('BlocksService', () => {
 
 		it('Returns the correct summary for the given block number', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			const blockSummary = await blocksService.fetchBlockHeader();
 
@@ -522,24 +536,24 @@ describe('BlocksService', () => {
 
 		it('Should correctly store the most recent queried blocks', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			await blocksService.fetchBlock(blockHash789629, mockHistoricApi, options);
 			await blocksService.fetchBlock(blockHash20000, mockHistoricApi, options);
 
-			expect(cache.length).toBe(2);
+			expect(cache.size).toBe(2);
 		});
 
 		it('Should have a max of 2 blocks within the LRUcache, and should save the most recent and remove the oldest block', async () => {
 			// Reset LRU cache
-			cache.reset();
+			cache.clear();
 
 			await blocksService.fetchBlock(blockHash789629, mockHistoricApi, options);
 			await blocksService.fetchBlock(blockHash20000, mockHistoricApi, options);
 			await blocksService.fetchBlock(blockHash100000, mockHistoricApi, options);
 
 			expect(cache.get(blockHash789629.toString())).toBe(undefined);
-			expect(cache.length).toBe(2);
+			expect(cache.size).toBe(2);
 		});
 	});
 });

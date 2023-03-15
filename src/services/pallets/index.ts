@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+export * from '././PalletsErrorsService';
+export * from '././PalletsEventsService';
 export * from './PalletsAssetsService';
+export * from './PalletsNominationPoolsService';
 export * from './PalletsStakingProgressService';
+export * from './PalletsStakingValidatorsService';
 export * from './PalletsStorageService';

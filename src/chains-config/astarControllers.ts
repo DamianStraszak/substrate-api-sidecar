@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ControllerConfig } from '../types/chains-config';
-import { initLRUCache } from './cache/lruCache';
+import { initLRUCache, QueryFeeDetailsCache } from './cache';
 
 /**
  * Controllers for Astar collator
@@ -32,6 +32,7 @@ export const astarControllers: ControllerConfig = {
 		'NodeTransactionPool',
 		'NodeVersion',
 		'PalletsAssets',
+		'PalletsErrors',
 		'PalletsStorage',
 		'Paras',
 		'RuntimeCode',
@@ -45,5 +46,6 @@ export const astarControllers: ControllerConfig = {
 		finalizes: true,
 		minCalcFeeRuntime: 1,
 		blockStore: initLRUCache(),
+		hasQueryFeeApi: new QueryFeeDetailsCache(null, null),
 	},
 };

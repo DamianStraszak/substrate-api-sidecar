@@ -24,7 +24,7 @@ export interface ISidecarConfig {
 }
 
 interface ISidecarConfigSubstrate {
-	WS_URL: string;
+	URL: string;
 	TYPES_BUNDLE: string;
 	TYPES_CHAIN: string;
 	TYPES_SPEC: string;
@@ -41,4 +41,8 @@ interface ISidecarConfigLog {
 	JSON: boolean;
 	FILTER_RPC: boolean;
 	STRIP_ANSI: boolean;
+	WRITE: boolean;
+	WRITE_PATH: string;
+	WRITE_MAX_FILE_SIZE: number;
+	WRITE_MAX_FILES: number;
 }

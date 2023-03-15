@@ -17,16 +17,22 @@
 import {
 	AccountsAssets,
 	AccountsBalanceInfo,
+	AccountsConvert,
 	AccountsStakingInfo,
 	AccountsStakingPayouts,
 	AccountsValidate,
 	AccountsVestingInfo,
 } from './accounts';
 import { Blocks, BlocksExtrinsics, BlocksTrace } from './blocks';
+import { ContractsInk } from './contracts';
 import { NodeNetwork, NodeTransactionPool, NodeVersion } from './node';
 import {
 	PalletsAssets,
+	PalletsErrors,
+	PalletsEvents,
+	PalletsNominationPools,
 	PalletsStakingProgress,
+	PalletsStakingValidators,
 	PalletsStorage,
 } from './pallets';
 import { Paras } from './paras';
@@ -47,12 +53,18 @@ export const controllers = {
 	BlocksTrace,
 	AccountsAssets,
 	AccountsBalanceInfo,
+	AccountsConvert,
 	AccountsStakingInfo,
 	AccountsValidate,
 	AccountsVestingInfo,
 	AccountsStakingPayouts,
+	ContractsInk,
 	PalletsAssets,
+	PalletsErrors,
+	PalletsEvents,
+	PalletsNominationPools,
 	PalletsStakingProgress,
+	PalletsStakingValidators,
 	PalletsStorage,
 	NodeNetwork,
 	NodeTransactionPool,

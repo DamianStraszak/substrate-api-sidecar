@@ -18,19 +18,14 @@ import { ApiPromise } from '@polkadot/api';
 import { isHex } from '@polkadot/util';
 import { RequestHandler } from 'express';
 import { BadRequest } from 'http-errors';
-import LRU from 'lru-cache';
 
+import { validateBoolean } from '../../middleware/validate';
 import { BlocksService } from '../../services';
+import { ControllerOptions } from '../../types/chains-config';
 import { INumberParam, IRangeQueryParam } from '../../types/requests';
 import { IBlock } from '../../types/responses';
 import { PromiseQueue } from '../../util/PromiseQueue';
 import AbstractController from '../AbstractController';
-
-interface ControllerOptions {
-	finalizes: boolean;
-	minCalcFeeRuntime: null | number;
-	blockStore: LRU<string, IBlock>;
-}
 
 /**
  * GET a block.
@@ -96,12 +91,21 @@ export default class BlocksController extends AbstractController<BlocksService> 
 		super(
 			api,
 			'/blocks',
-			new BlocksService(api, options.minCalcFeeRuntime, options.blockStore)
+			new BlocksService(
+				api,
+				options.minCalcFeeRuntime,
+				options.blockStore,
+				options.hasQueryFeeApi
+			)
 		);
 		this.initRoutes();
 	}
 
 	protected initRoutes(): void {
+		this.router.use(
+			this.path,
+			validateBoolean(['eventDocs', 'extrinsicDocs', 'finalized'])
+		);
 		this.safeMountAsyncGetHandlers([
 			['/', this.getBlocks],
 			['/head', this.getLatestBlock],

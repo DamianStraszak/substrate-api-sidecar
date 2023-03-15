@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ControllerConfig } from '../types/chains-config';
-import { initLRUCache } from './cache/lruCache';
+import { initLRUCache, QueryFeeDetailsCache } from './cache';
 
 /**
  * Controllers that Sidecar will always default to. This will always be
@@ -31,10 +31,13 @@ export const defaultControllers: ControllerConfig = {
 		'AccountsVestingInfo',
 		'Blocks',
 		'BlocksExtrinsics',
+		'ContractsInk',
 		'NodeNetwork',
 		'NodeTransactionPool',
 		'NodeVersion',
 		'PalletsAssets',
+		'PalletsErrors',
+		'PalletsEvents',
 		'PalletsStakingProgress',
 		'PalletsStorage',
 		'Paras',
@@ -50,5 +53,6 @@ export const defaultControllers: ControllerConfig = {
 		finalizes: true,
 		minCalcFeeRuntime: null,
 		blockStore: initLRUCache(),
+		hasQueryFeeApi: new QueryFeeDetailsCache(null, null),
 	},
 };

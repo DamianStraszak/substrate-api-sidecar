@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ControllerConfig } from '../types/chains-config';
-import { initLRUCache } from './cache/lruCache';
+import { initLRUCache, QueryFeeDetailsCache } from './cache';
 
 /**
  * Statemine configuration for Sidecar.
@@ -23,6 +23,7 @@ import { initLRUCache } from './cache/lruCache';
 export const statemineControllers: ControllerConfig = {
 	controllers: [
 		'AccountsAssets',
+		'AccountsBalanceInfo',
 		'AccountsValidate',
 		'Blocks',
 		'BlocksExtrinsics',
@@ -30,6 +31,8 @@ export const statemineControllers: ControllerConfig = {
 		'NodeTransactionPool',
 		'NodeVersion',
 		'PalletsAssets',
+		'PalletsErrors',
+		'PalletsEvents',
 		'RuntimeCode',
 		'RuntimeMetadata',
 		'RuntimeSpec',
@@ -42,5 +45,6 @@ export const statemineControllers: ControllerConfig = {
 		finalizes: true,
 		minCalcFeeRuntime: 1,
 		blockStore: initLRUCache(),
+		hasQueryFeeApi: new QueryFeeDetailsCache(null, null),
 	},
 };

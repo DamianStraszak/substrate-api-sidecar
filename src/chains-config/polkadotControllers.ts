@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ControllerConfig } from '../types/chains-config';
-import { initLRUCache } from './cache/lruCache';
+import { initLRUCache, QueryFeeDetailsCache } from './cache';
 
 /**
  * Polkadot configuration for Sidecar.
@@ -23,6 +23,7 @@ import { initLRUCache } from './cache/lruCache';
 export const polkadotControllers: ControllerConfig = {
 	controllers: [
 		'AccountsBalanceInfo',
+		'AccountsConvert',
 		'AccountsStakingInfo',
 		'AccountsStakingPayouts',
 		'AccountsValidate',
@@ -33,7 +34,11 @@ export const polkadotControllers: ControllerConfig = {
 		'NodeNetwork',
 		'NodeTransactionPool',
 		'NodeVersion',
+		'PalletsErrors',
+		'PalletsEvents',
+		'PalletsNominationPools',
 		'PalletsStakingProgress',
+		'PalletsStakingValidators',
 		'PalletsStorage',
 		'Paras',
 		'RuntimeCode',
@@ -48,5 +53,6 @@ export const polkadotControllers: ControllerConfig = {
 		finalizes: true,
 		minCalcFeeRuntime: 0,
 		blockStore: initLRUCache(),
+		hasQueryFeeApi: new QueryFeeDetailsCache(27, 28),
 	},
 };

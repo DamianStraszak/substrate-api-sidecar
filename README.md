@@ -35,8 +35,9 @@ Compatibility:
 |---------------|:-----------:|
 |     v14.x.x   |   Stable    |
 |     v16.x.x   |   Stable    |
-|     v17.x.x   |  Not Stable |
-|     v18.x.x   |   Pending   |
+|     v17.x.x   |   Stable    |
+|     v18.x.x   |   Stable    |
+|     v19.x.x   |   Pending   |
 
 NOTE: Node LTS (`long term support`) versions start with an even number, and odd number versions are subject to a 6 month testing period with active support before they are unsupported. It is recommended to use sidecar with a stable actively maintained version of node.js.
 
@@ -45,7 +46,7 @@ NOTE: Node LTS (`long term support`) versions start with an even number, and odd
 - [NPM package installation and usage](#npm-package-installation-and-usage)
 - [Source code installation and usage](#source-code-installation-and-usage)
 - [Configuration](#configuration)
-- [Debugging fee and payout calculations](#debugging-fee-and-payout-calculations)
+- [Debugging fee and staking payout calculations](#debugging-staking-payout-calculations)
 - [Available endpoints](https://paritytech.github.io/substrate-api-sidecar/dist/)
 - [Chain integration guide](./guides/CHAIN_INTEGRATION.md)
 - [Docker](#docker)
@@ -161,17 +162,14 @@ For more information on our configuration manager visit its readme [here](https:
 
 ### Substrate node
 
-- `SAS_SUBSTRATE_WS_URL`: WebSocket URL to which the RPC proxy will attempt to connect to, defaults to
-    `ws://127.0.0.1:9944`.
+- `SAS_SUBSTRATE_URL`: URL to which the RPC proxy will attempt to connect to, defaults to
+    `ws://127.0.0.1:9944`. Accepts both a websocket, and http URL.
 
 #### Custom substrate types
 
 Some chains require custom type definitions in order for Sidecar to know how to decode the data
 retrieved from the node. Sidecar affords environment variables which allow the user to specify an absolute path to a JSON file that contains type definitions in the corresponding formats. Consult polkadot-js/api for more info on
-the type formats (see `RegisteredTypes`).
-
-**N.B** Types set from environment variables will override the corresponding types pulled from
-@polkadot/apps-config.
+the type formats (see `RegisteredTypes`). There is a helper CLI tool called [generate-type-bundle](https://github.com/paritytech/generate-type-bundle) that can generate a `typesBundle.json` file for you using chain information from [`@polkadot/apps-config`](https://github.com/polkadot-js/apps/tree/master/packages/apps-config). The generated json file from this tool will work directly with the `SAS_SUBSTRATE_TYPES_BUNDLE` ENV variable. 
 
 - `SAS_SUBSTRATE_TYPES_BUNDLE`: a bundle of types with versioning info, type aliases, derives, and
     rpc definitions. Format: `OverrideBundleType` (see [`typesBundle`](https://github.com/polkadot-js/api/blob/21039dec1fcad36061a96bf5526248c5fab38780/packages/types/src/types/registry.ts#L72)).
@@ -203,13 +201,17 @@ export SAS_SUBSTRATE_TYPES=/path/to/my-chains-types.json
 
 ### Logging
 
-- `SAS_LOG_LEVEL`: the lowest priority log level to surface, defaults to `info`. Tip: set to `http`
+- `SAS_LOG_LEVEL`: The lowest priority log level to surface, defaults to `info`. Tip: set to `http`
     to see all HTTP requests.
-- `SAS_LOG_JSON`: wether or not to have logs formatted as JSON, defaults to `false`.
+- `SAS_LOG_JSON`:Whether or not to have logs formatted as JSON, defaults to `false`.
     Useful when using `stdout` to programmatically process Sidecar log data.
-- `SAS_LOG_FILTER_RPC`: wether or not to filter polkadot-js API-WS RPC logging, defaults to `false`.
-- `SAS_LOG_STRIP_ANSI`: wether or not to strip ANSI characters from logs, defaults
+- `SAS_LOG_FILTER_RPC`: Whether or not to filter polkadot-js API-WS RPC logging, defaults to `false`.
+- `SAS_LOG_STRIP_ANSI`: Whether or not to strip ANSI characters from logs, defaults
     to `false`. Useful when logging RPC calls with JSON written to transports.
+- `SAS_LOG_WRITE`: Whether or not to write logs to a log file. Default is set to `false`. Accepts a boolean value. The log files will be written as `logs.log`. **NOTE**: It will only log what is available depending on what `SAS_LOG_LEVEL` is set to.
+- `SAS_LOG_WRITE_PATH`: Specifies the path to write the log files. Default will be where the package is installed.
+- `SAS_LOG_WRITE_MAX_FILE_SIZE`: Specifies in bytes what the max file size for the written log files should be. Default is `5242880` (5MB). **NOTE** Once the the max amount of files have reached their max size, the logger will start to rewrite over the first log file.
+- `SAS_LOG_WRITE_MAX_FILES`: Specifies how many files can be written. Default is 5.
 
 #### Log levels
 
@@ -231,10 +233,10 @@ file you can `symlink` it with `.env.test`. For example you could run
 `ln -s .env.myEnv .env.test && yarn start:log-rpc` to use `.env.myEnv` to set ENV variables. (see linux
 commands `ln` and `unlink` for more info.)
 
-## Debugging fee and payout calculations
+## Debugging fee and staking payout calculations
 
-It is possible to get more information about the fee and payout calculation process logged to
-the console. Because this fee calculation happens in the statically compiled web assembly part
+It is possible to get more information about the fee and staking payout calculation process logged to
+the console. Because these calculations happens in the statically compiled web assembly part,
 a re-compile with the proper environment variable set is necessary:
 
 ```bash
@@ -300,11 +302,9 @@ All the commits in this repo follow the [Conventional Commits spec](https://www.
 ### Updating polkadot-js dependencies
 
 1. Every Monday the polkadot-js ecosystem will usually come out with a new release. It's important that we keep up,
-and read the release notes for any breaking changes or high priority updates. In order to update all the dependencies and resolutions run `yarn update-pjs-deps`.
+and read the release notes for any breaking changes or high priority updates. In order to update all the dependencies and resolutions run `yarn up "@polkadot/*"`.
 
     - @polkadot/api [release notes](https://github.com/polkadot-js/api/releases)
-    - @polkadot/apps-config [release notes](https://github.com/polkadot-js/apps/releases)
-      - If there are any major changes to this package that includes third party type packages, its worth noting to contact the maintainers of sidecar and do a peer review of the changes in apps-config, and make sure no bugs will be inherited.
     - @polkadot/util-crypto [release notes](https://github.com/polkadot-js/common/releases)
     - @substrate/calc [npm release page](https://www.npmjs.com/package/@substrate/calc)
 
@@ -315,7 +315,8 @@ and read the release notes for any breaking changes or high priority updates. In
    yarn build
    yarn lint
    yarn test
-   yarn test:init-e2e-tests
+   yarn test:historical-e2e-tests
+   yarn test:latest-e2e-tests
    ```
 
 1. Commit the dependency updates with a name like `fix(deps): update pjs api` (title depending on what got updated, see commit history for other examples of this), and wait to get it merged.
