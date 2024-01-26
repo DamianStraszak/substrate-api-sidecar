@@ -21,6 +21,7 @@ import AbstractController from '../controllers/AbstractController';
 import { AbstractService } from '../services/AbstractService';
 import { ControllerConfig } from '../types/chains-config';
 import { acalaControllers } from './acalaControllers';
+import { alephControllers } from './alephControllers';
 import { assetHubKusamaControllers } from './assetHubKusamaControllers';
 import { assetHubPolkadotControllers } from './assetHubPolkadotControllers';
 import { assetHubWestendControllers } from './assetHubWestendControllers';
@@ -67,6 +68,7 @@ const specToControllerMap: { [x: string]: ControllerConfig } = {
 	westmint: assetHubWestendControllers,
 	shiden: shidenControllers,
 	astar: astarControllers,
+	'aleph-node': alephControllers,
 	sora: soraControllers,
 	calamari: calamariControllers,
 	karura: karuraControllers,
